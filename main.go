@@ -26,9 +26,12 @@ import (
 
 	"gopkg.in/alecthomas/kingpin.v2"
 
+	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/prometheus/common/log"
+	"github.com/prometheus/common/promlog"
+	"github.com/prometheus/common/promlog/flag"
 	"github.com/prometheus/common/version"
 
 	"github.com/influxdata/influxdb/models"
@@ -72,7 +75,7 @@ func (c *influxDBCollector) serveUdp() {
 	for {
 		n, _, err := c.conn.ReadFromUDP(buf)
 		if err != nil {
-			log.Warnf("Failed to read UDP message: %s", err)
+			level.Warn(c.logger).Log("msg", "Failed to read UDP message", "err", err)
 			continue
 		}
 
@@ -82,7 +85,7 @@ func (c *influxDBCollector) serveUdp() {
 		precision := "ns"
 		points, err := models.ParsePointsWithPrecision(bufCopy, time.Now().UTC(), precision)
 		if err != nil {
-			log.Errorf("Error parsing udp packet: %s", err)
+			level.Error(c.logger).Log("msg", "Error parsing udp packet", "err", err)
 			udpParseErrors.Inc()
 			return
 		}
@@ -95,15 +98,17 @@ type influxDBCollector struct {
 	samples map[string]*influxDBSample
 	mu      sync.Mutex
 	ch      chan *influxDBSample
+	logger  log.Logger
 
 	// Udp
 	conn *net.UDPConn
 }
 
-func newInfluxDBCollector() *influxDBCollector {
+func newInfluxDBCollector(logger log.Logger) *influxDBCollector {
 	c := &influxDBCollector{
 		ch:      make(chan *influxDBSample),
 		samples: map[string]*influxDBSample{},
+		logger:  logger,
 	}
 	go c.processSamples()
 	return c
@@ -137,7 +142,7 @@ func (c *influxDBCollector) parsePointsToSample(points []models.Point) {
 	for _, s := range points {
 		fields, err := s.Fields()
 		if err != nil {
-			log.Errorf("error getting fields from point: %s", err)
+			level.Error(c.logger).Log("msg", "error getting fields from point", "err", err)
 			continue
 		}
 		for field, v := range fields {
@@ -256,15 +261,16 @@ func init() {
 }
 
 func main() {
-	log.AddFlags(kingpin.CommandLine)
-	kingpin.Version(version.Print("influxdb_exporter"))
+	promlogConfig := &promlog.Config{}
+	flag.AddFlags(kingpin.CommandLine, promlogConfig)
 	kingpin.HelpFlag.Short('h')
 	kingpin.Parse()
 
-	log.Infoln("Starting influxdb_exporter", version.Info())
-	log.Infoln("Build context", version.BuildContext())
+	logger := promlog.New(promlogConfig)
+	level.Info(logger).Log("msg", "Starting influxdb_exporter", "version", version.Info())
+	level.Info(logger).Log("msg", "Build context", "context", version.BuildContext())
 
-	c := newInfluxDBCollector()
+	c := newInfluxDBCollector(logger)
 	prometheus.MustRegister(c)
 
 	addr, err := net.ResolveUDPAddr("udp", *bindAddress)
@@ -300,6 +306,8 @@ func main() {
     </html>`))
 	})
 
-	log.Infoln("Listening on", *listenAddress)
-	http.ListenAndServe(*listenAddress, nil)
+	if err := http.ListenAndServe(*listenAddress, nil); err != nil {
+		level.Error(logger).Log("msg", "Error starting HTTP server", "err", err)
+		os.Exit(1)
+	}
 }
