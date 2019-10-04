@@ -1,6 +1,7 @@
-## ?.?.? / unreleased
+## 0.3.0 / unreleased
 
 * [CHANGE] Do not run as root in the Docker container by default ([#40](https://github.com/prometheus/influxdb_exporter/pull/40))
+* [CHANGE] Update logging library & flags ([#58](https://github.com/prometheus/influxdb_exporter/pull/58))
 
 ## 0.2.0 / 2019-02-28
 
