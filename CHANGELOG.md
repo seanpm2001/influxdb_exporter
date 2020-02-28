@@ -1,3 +1,7 @@
+## 0.4.0 / 2020-02-28
+
+* [FEATURE] Add ping endpoint that some clients expect ([#60](https://github.com/prometheus/influxdb_exporter/pull/60))
+
 ## 0.3.0 / 2019-10-04
 
 * [CHANGE] Do not run as root in the Docker container by default ([#40](https://github.com/prometheus/influxdb_exporter/pull/40))
