@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main_test
+package main
 
 import (
 	"fmt"
@@ -44,21 +44,6 @@ func BenchmarkHardcodedReplace(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		var newString = original
 		ReplaceInvalidChars(&newString)
-	}
-}
-
-// analog of invalidChars = regexp.MustCompile("[^a-zA-Z0-9_]")
-func ReplaceInvalidChars(in *string) {
-
-	for charIndex, char := range *in {
-		charInt := int(char)
-		if !((charInt >= 97 && charInt <= 122) || // a-z
-			(charInt >= 65 && charInt <= 90) || // A-Z
-			(charInt >= 48 && charInt <= 57) || // 0-9
-			charInt == 95) { // _
-
-			*in = (*in)[:charIndex] + "_" + (*in)[charIndex+1:]
-		}
 	}
 }
 
