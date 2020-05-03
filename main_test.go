@@ -76,8 +76,7 @@ func BenchmarkSprintfArray(b *testing.B) {
 		for _, l := range labelnames {
 			parts = append(parts, l, labels[l])
 		}
-		ID := fmt.Sprintf("%q", parts)
-		ID = ID
+		fmt.Sprintf("%q", parts)
 	}
 }
 
@@ -96,7 +95,6 @@ func BenchmarkStringJoin(b *testing.B) {
 		for _, l := range labelnames {
 			parts = append(parts, l, labels[l])
 		}
-		ID := strings.Join(parts, ".")
-		ID = ID
+		strings.Join(parts, ".")
 	}
 }
