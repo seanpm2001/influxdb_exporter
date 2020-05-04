@@ -19,7 +19,6 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"regexp"
 	"sort"
 	"sync"
 	"time"
@@ -35,6 +34,7 @@ import (
 	"github.com/prometheus/common/version"
 
 	"github.com/influxdata/influxdb/models"
+	"strings"
 )
 
 const (
@@ -59,7 +59,6 @@ var (
 			Help: "Current total udp parse errors.",
 		},
 	)
-	invalidChars = regexp.MustCompile("[^a-zA-Z0-9_]")
 )
 
 type influxDBSample struct {
@@ -166,17 +165,21 @@ func (c *influxDBCollector) parsePointsToSample(points []models.Point) {
 			if field == "value" {
 				name = string(s.Name())
 			} else {
-				name = fmt.Sprintf("%s_%s", s.Name(), field)
+				name = string(s.Name()) + "_" + field
 			}
 
+			ReplaceInvalidChars(&name)
 			sample := &influxDBSample{
-				Name:      invalidChars.ReplaceAllString(name, "_"),
+				Name:      name,
 				Timestamp: s.Time(),
 				Value:     value,
 				Labels:    map[string]string{},
 			}
 			for _, v := range s.Tags() {
-				sample.Labels[invalidChars.ReplaceAllString(string(v.Key), "_")] = string(v.Value)
+
+				key := string(v.Key)
+				ReplaceInvalidChars(&key)
+				sample.Labels[key] = string(v.Value)
 			}
 
 			// Calculate a consistent unique ID for the sample.
@@ -190,7 +193,7 @@ func (c *influxDBCollector) parsePointsToSample(points []models.Point) {
 			for _, l := range labelnames {
 				parts = append(parts, l, sample.Labels[l])
 			}
-			sample.ID = fmt.Sprintf("%q", parts)
+			sample.ID = strings.Join(parts, ".")
 
 			c.ch <- sample
 		}
@@ -253,6 +256,21 @@ func (c *influxDBCollector) Collect(ch chan<- prometheus.Metric) {
 // Describe implements prometheus.Collector.
 func (c *influxDBCollector) Describe(ch chan<- *prometheus.Desc) {
 	ch <- lastPush.Desc()
+}
+
+// analog of invalidChars = regexp.MustCompile("[^a-zA-Z0-9_]")
+func ReplaceInvalidChars(in *string) {
+
+	for charIndex, char := range *in {
+		charInt := int(char)
+		if !((charInt >= 97 && charInt <= 122) || // a-z
+			(charInt >= 65 && charInt <= 90) || // A-Z
+			(charInt >= 48 && charInt <= 57) || // 0-9
+			charInt == 95) { // _
+
+			*in = (*in)[:charIndex] + "_" + (*in)[charIndex+1:]
+		}
+	}
 }
 
 func init() {
