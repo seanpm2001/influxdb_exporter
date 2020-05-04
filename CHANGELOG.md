@@ -1,3 +1,7 @@
+## 0.4.1 / 2020-05-04
+
+* [ENHANCEMENT] Improve performance by reducing allocations ([#64](https://github.com/prometheus/influxdb_exporter/pull/64))
+
 ## 0.4.0 / 2020-02-28
 
 * [FEATURE] Add ping endpoint that some clients expect ([#60](https://github.com/prometheus/influxdb_exporter/pull/60))
