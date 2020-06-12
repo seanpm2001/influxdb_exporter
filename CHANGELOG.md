@@ -1,3 +1,7 @@
+## 0.4.2 / 2020-06-12
+
+* [CHANGE] Update all dependencies, including Prometheus client ([#66](https://github.com/prometheus/influxdb_exporter/pull/66))
+
 ## 0.4.1 / 2020-05-04
 
 * [ENHANCEMENT] Improve performance by reducing allocations ([#64](https://github.com/prometheus/influxdb_exporter/pull/64))
