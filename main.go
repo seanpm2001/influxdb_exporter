@@ -44,6 +44,7 @@ const (
 var (
 	listenAddress   = kingpin.Flag("web.listen-address", "Address on which to expose metrics and web interface.").Default(":9122").String()
 	metricsPath     = kingpin.Flag("web.telemetry-path", "Path under which to expose Prometheus metrics.").Default("/metrics").String()
+	selfMetricsPath = kingpin.Flag("web.self-telemetry-path", "Path under which to expose self metrics.").Default("/self-metrics").String()
 	sampleExpiry    = kingpin.Flag("influxdb.sample-expiry", "How long a sample is valid for.").Default("5m").Duration()
 	bindAddress     = kingpin.Flag("udp.bind-address", "Address on which to listen for udp packets.").Default(":9122").String()
 	exportTimestamp = kingpin.Flag("timestamps", "Export timestamps of points").Default("false").Bool()
@@ -59,6 +60,7 @@ var (
 			Help: "Current total udp parse errors.",
 		},
 	)
+	influxDbRegistry = prometheus.NewRegistry()
 )
 
 type influxDBSample struct {
@@ -176,8 +178,10 @@ func (c *influxDBCollector) parsePointsToSample(points []models.Point) {
 				Labels:    map[string]string{},
 			}
 			for _, v := range s.Tags() {
-
 				key := string(v.Key)
+				if key == "__name__" {
+					continue
+				}
 				ReplaceInvalidChars(&key)
 				sample.Labels[key] = string(v.Value)
 			}
@@ -274,8 +278,8 @@ func ReplaceInvalidChars(in *string) {
 }
 
 func init() {
-	prometheus.MustRegister(version.NewCollector("influxdb_exporter"))
-	prometheus.MustRegister(udpParseErrors)
+	influxDbRegistry.MustRegister(version.NewCollector("influxdb_exporter"))
+	influxDbRegistry.MustRegister(udpParseErrors)
 }
 
 func main() {
@@ -289,7 +293,7 @@ func main() {
 	level.Info(logger).Log("msg", "Build context", "context", version.BuildContext())
 
 	c := newInfluxDBCollector(logger)
-	prometheus.MustRegister(c)
+	influxDbRegistry.MustRegister(c)
 
 	addr, err := net.ResolveUDPAddr("udp", *bindAddress)
 	if err != nil {
@@ -319,7 +323,8 @@ func main() {
 		http.Error(w, "", http.StatusNoContent)
 	})
 
-	http.Handle(*metricsPath, promhttp.Handler())
+	http.Handle(*metricsPath, promhttp.HandlerFor(influxDbRegistry, promhttp.HandlerOpts{}))
+	http.Handle(*selfMetricsPath, promhttp.Handler())
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`<html>
@@ -327,6 +332,7 @@ func main() {
     <body>
     <h1>InfluxDB Exporter</h1>
     <p><a href="` + *metricsPath + `">Metrics</a></p>
+    <p><a href="` + *selfMetricsPath + `">Self Metrics</a></p>
     </body>
     </html>`))
 	})
