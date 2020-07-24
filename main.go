@@ -178,6 +178,9 @@ func (c *influxDBCollector) parsePointsToSample(points []models.Point) {
 			for _, v := range s.Tags() {
 
 				key := string(v.Key)
+				if key == "__name__" {
+					continue
+				}
 				ReplaceInvalidChars(&key)
 				sample.Labels[key] = string(v.Value)
 			}
