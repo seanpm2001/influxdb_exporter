@@ -42,13 +42,13 @@ const (
 )
 
 var (
-	listenAddress   = kingpin.Flag("web.listen-address", "Address on which to expose metrics and web interface.").Default(":9122").String()
-	metricsPath     = kingpin.Flag("web.telemetry-path", "Path under which to expose Prometheus metrics.").Default("/metrics").String()
-	selfMetricsPath = kingpin.Flag("web.self-telemetry-path", "Path under which to expose self metrics.").Default("/self-metrics").String()
-	sampleExpiry    = kingpin.Flag("influxdb.sample-expiry", "How long a sample is valid for.").Default("5m").Duration()
-	bindAddress     = kingpin.Flag("udp.bind-address", "Address on which to listen for udp packets.").Default(":9122").String()
-	exportTimestamp = kingpin.Flag("timestamps", "Export timestamps of points").Default("false").Bool()
-	lastPush        = prometheus.NewGauge(
+	listenAddress       = kingpin.Flag("web.listen-address", "Address on which to expose metrics and web interface.").Default(":9122").String()
+	metricsPath         = kingpin.Flag("web.telemetry-path", "Path under which to expose Prometheus metrics.").Default("/metrics").String()
+	exporterMetricsPath = kingpin.Flag("web.exporter-telemetry-path", "Path under which to expose exporter metrics.").Default("/metrics/exporter").String()
+	sampleExpiry        = kingpin.Flag("influxdb.sample-expiry", "How long a sample is valid for.").Default("5m").Duration()
+	bindAddress         = kingpin.Flag("udp.bind-address", "Address on which to listen for udp packets.").Default(":9122").String()
+	exportTimestamp     = kingpin.Flag("timestamps", "Export timestamps of points").Default("false").Bool()
+	lastPush            = prometheus.NewGauge(
 		prometheus.GaugeOpts{
 			Name: "influxdb_last_push_timestamp_seconds",
 			Help: "Unix timestamp of the last received influxdb metrics push in seconds.",
@@ -179,9 +179,6 @@ func (c *influxDBCollector) parsePointsToSample(points []models.Point) {
 			}
 			for _, v := range s.Tags() {
 				key := string(v.Key)
-				if key == "__name__" {
-					continue
-				}
 				ReplaceInvalidChars(&key)
 				sample.Labels[key] = string(v.Value)
 			}
@@ -324,7 +321,7 @@ func main() {
 	})
 
 	http.Handle(*metricsPath, promhttp.HandlerFor(influxDbRegistry, promhttp.HandlerOpts{}))
-	http.Handle(*selfMetricsPath, promhttp.Handler())
+	http.Handle(*exporterMetricsPath, promhttp.Handler())
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`<html>
@@ -332,7 +329,7 @@ func main() {
     <body>
     <h1>InfluxDB Exporter</h1>
     <p><a href="` + *metricsPath + `">Metrics</a></p>
-    <p><a href="` + *selfMetricsPath + `">Self Metrics</a></p>
+    <p><a href="` + *exporterMetricsPath + `">Exporter Metrics</a></p>
     </body>
     </html>`))
 	})
