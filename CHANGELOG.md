@@ -1,3 +1,13 @@
+## 0.5.0 / 2020-08-21
+
+* [CHANGE] Move exporter metrics to their own endpoint ([#68](https://github.com/prometheus/influxdb_exporter/pull/68))
+* [ENHANCEMENT] Ignore the `__name__` label on incoming metrics ([#69](https://github.com/prometheus/influxdb_exporter/pull/69))
+
+This release improves the experience in mixed Prometheus/InfluxDB environments.
+By moving the exporter's own metrics to a separate endpoint, we avoid conflicts with metrics from other services using the Prometheus client library.
+In these circumstances, a spurious `__name__` label might appear, which we cannot ingest.
+The exporter now ignores it.
+
 ## 0.4.2 / 2020-06-12
 
 * [CHANGE] Update all dependencies, including Prometheus client ([#66](https://github.com/prometheus/influxdb_exporter/pull/66))
