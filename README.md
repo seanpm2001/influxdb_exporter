@@ -11,7 +11,9 @@ transforms them and exposes them for consumption by Prometheus.
 
 This exporter supports float, int and boolean fields. Tags are converted to Prometheus labels.
 
-The exporter also listens on a UDP socket, port 9122 by default.
+The exporter also listens on a UDP socket, port 9122 by default, where it
+exposes influxDB metrics using `/metrics` endpoint 
+and exposes exporter's self metrics using `/metrics/exporter` endpoint.
 
 ## Timestamps
 
