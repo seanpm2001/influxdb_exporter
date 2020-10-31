@@ -14,6 +14,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net"
@@ -33,8 +34,9 @@ import (
 	"github.com/prometheus/common/promlog/flag"
 	"github.com/prometheus/common/version"
 
-	"github.com/influxdata/influxdb/models"
 	"strings"
+
+	"github.com/influxdata/influxdb/models"
 )
 
 const (
@@ -69,6 +71,10 @@ type influxDBSample struct {
 	Labels    map[string]string
 	Value     float64
 	Timestamp time.Time
+}
+
+type errorResponse struct {
+	Error string `json:"error"`
 }
 
 func (c *influxDBCollector) serveUdp() {
@@ -119,7 +125,7 @@ func (c *influxDBCollector) influxDBPost(w http.ResponseWriter, r *http.Request)
 	lastPush.Set(float64(time.Now().UnixNano()) / 1e9)
 	buf, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("error reading body: %s", err), 500)
+		JSONErrorResponse(w, fmt.Sprintf("error reading body: %s", err), 500)
 		return
 	}
 
@@ -129,7 +135,7 @@ func (c *influxDBCollector) influxDBPost(w http.ResponseWriter, r *http.Request)
 	}
 	points, err := models.ParsePointsWithPrecision(buf, time.Now().UTC(), precision)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("error parsing request: %s", err), 400)
+		JSONErrorResponse(w, fmt.Sprintf("error parsing request: %s", err), 400)
 		return
 	}
 
@@ -275,6 +281,16 @@ func ReplaceInvalidChars(in *string) {
 			*in = (*in)[:charIndex] + "_" + (*in)[charIndex+1:]
 		}
 	}
+}
+
+//JSONErrorResponse write error in json fromat and set response code
+func JSONErrorResponse(w http.ResponseWriter, err string, code int) {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("X-Content-Type-Options", "nosniff")
+	w.WriteHeader(code)
+	json.NewEncoder(w).Encode(errorResponse{
+		Error: err,
+	})
 }
 
 func init() {
