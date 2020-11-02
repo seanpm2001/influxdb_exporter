@@ -1,3 +1,7 @@
+## 0.6.0 / 2020-11-02
+
+* [ENHANCEMENT] Return errors as JSON, in line with InfluxDB ([#74](https://github.com/prometheus/influxdb_exporter/pull/74))
+
 ## 0.5.0 / 2020-08-21
 
 * [CHANGE] Move exporter metrics to their own endpoint ([#68](https://github.com/prometheus/influxdb_exporter/pull/68))
