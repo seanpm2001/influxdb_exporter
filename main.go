@@ -47,7 +47,6 @@ var (
 	listenAddress       = kingpin.Flag("web.listen-address", "Address on which to expose metrics and web interface.").Default(":9122").String()
 	metricsPath         = kingpin.Flag("web.telemetry-path", "Path under which to expose Prometheus metrics.").Default("/metrics").String()
 	exporterMetricsPath = kingpin.Flag("web.exporter-telemetry-path", "Path under which to expose exporter metrics.").Default("/metrics/exporter").String()
-	metricPrefix        = kingpin.Flag("metric.prefix", "Prefix Prometheus metrics with this string.").Default("").String()
 	sampleExpiry        = kingpin.Flag("influxdb.sample-expiry", "How long a sample is valid for.").Default("5m").Duration()
 	bindAddress         = kingpin.Flag("udp.bind-address", "Address on which to listen for udp packets.").Default(":9122").String()
 	exportTimestamp     = kingpin.Flag("timestamps", "Export timestamps of points.").Default("false").Bool()
@@ -172,9 +171,9 @@ func (c *influxDBCollector) parsePointsToSample(points []models.Point) {
 
 			var name string
 			if field == "value" {
-				name = *metricPrefix + string(s.Name())
+				name = string(s.Name())
 			} else {
-				name = *metricPrefix + string(s.Name()) + "_" + field
+				name = string(s.Name()) + "_" + field
 			}
 
 			ReplaceInvalidChars(&name)
@@ -281,6 +280,10 @@ func ReplaceInvalidChars(in *string) {
 
 			*in = (*in)[:charIndex] + "_" + (*in)[charIndex+1:]
 		}
+	}
+	// prefix with _ if first char is 0-9
+	if int((*in)[0]) >= 48 && int((*in)[0]) <= 57 {
+		*in = "_" + *in
 	}
 }
 
