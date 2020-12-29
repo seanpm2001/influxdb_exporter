@@ -14,8 +14,10 @@
 package main
 
 import (
+	"compress/gzip"
 	"encoding/json"
 	"fmt"
+	"gopkg.in/alecthomas/kingpin.v2"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -23,8 +25,6 @@ import (
 	"sort"
 	"sync"
 	"time"
-    "compress/gzip"
-	"gopkg.in/alecthomas/kingpin.v2"
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
@@ -144,13 +144,13 @@ func (c *influxDBCollector) influxDBPost(w http.ResponseWriter, r *http.Request)
 		bufPointer := &buf
 		var err error
 		*bufPointer, err = ioutil.ReadAll(r.Body)
-	
+
 		if err != nil {
 			JSONErrorResponse(w, fmt.Sprintf("error reading body: %s", err), 500)
 			return
 		}
 	}
-	
+
 	precision := "ns"
 	if r.FormValue("precision") != "" {
 		precision = r.FormValue("precision")
