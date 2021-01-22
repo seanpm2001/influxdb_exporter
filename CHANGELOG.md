@@ -1,3 +1,7 @@
+## 0.8.0 / 2021-01-21
+
+* [ENHANCEMENT] Accept gzip encoding ([#78](https://github.com/prometheus/influxdb_exporter/pull/78))
+
 ## 0.7.0 / 2020-12-04
 
 * [ENHANCEMENT] Handle metric names that start with digits ([#77](https://github.com/prometheus/influxdb_exporter/pull/77))
