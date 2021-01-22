@@ -17,26 +17,25 @@ import (
 	"compress/gzip"
 	"encoding/json"
 	"fmt"
-	"gopkg.in/alecthomas/kingpin.v2"
 	"io/ioutil"
 	"net"
 	"net/http"
 	"os"
 	"sort"
+	"strings"
 	"sync"
 	"time"
 
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/common/promlog"
 	"github.com/prometheus/common/promlog/flag"
 	"github.com/prometheus/common/version"
 
-	"strings"
-
+	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/log/level"
 	"github.com/influxdata/influxdb/models"
+	"gopkg.in/alecthomas/kingpin.v2"
 )
 
 const (
