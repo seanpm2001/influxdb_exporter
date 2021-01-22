@@ -14,8 +14,10 @@
 package main
 
 import (
+	"compress/gzip"
 	"encoding/json"
 	"fmt"
+	"gopkg.in/alecthomas/kingpin.v2"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -23,8 +25,6 @@ import (
 	"sort"
 	"sync"
 	"time"
-
-	"gopkg.in/alecthomas/kingpin.v2"
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
@@ -122,11 +122,33 @@ func newInfluxDBCollector(logger log.Logger) *influxDBCollector {
 }
 
 func (c *influxDBCollector) influxDBPost(w http.ResponseWriter, r *http.Request) {
+
 	lastPush.Set(float64(time.Now().UnixNano()) / 1e9)
-	buf, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		JSONErrorResponse(w, fmt.Sprintf("error reading body: %s", err), 500)
-		return
+	var buf []byte
+
+	ce := r.Header.Get("Content-Encoding")
+
+	if ce == "gzip" {
+		bufPointer := &buf
+		gunzip, err := gzip.NewReader(r.Body)
+		if err != nil {
+			JSONErrorResponse(w, fmt.Sprintf("error reading compressed body: %s", err), 500)
+			return
+		}
+		*bufPointer, err = ioutil.ReadAll(gunzip)
+		if err != nil {
+			JSONErrorResponse(w, fmt.Sprintf("error decompressing data: %s", err), 500)
+			return
+		}
+	} else {
+		bufPointer := &buf
+		var err error
+		*bufPointer, err = ioutil.ReadAll(r.Body)
+
+		if err != nil {
+			JSONErrorResponse(w, fmt.Sprintf("error reading body: %s", err), 500)
+			return
+		}
 	}
 
 	precision := "ns"
