@@ -1,3 +1,7 @@
+## 0.8.1 / 2021-11-26
+
+* [ENHANCEMENT] Update Go & dependencies to enable build for windows/arm64 ([#93](https://github.com/prometheus/influxdb_exporter/pull/93))
+
 ## 0.8.0 / 2021-01-21
 
 * [ENHANCEMENT] Accept gzip encoding ([#78](https://github.com/prometheus/influxdb_exporter/pull/78))
