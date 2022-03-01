@@ -352,12 +352,15 @@ func main() {
 	go c.serveUdp()
 
 	http.HandleFunc("/write", c.influxDBPost)
+	http.HandleFunc("/api/v2/write", c.influxDBPost)
 
 	// Some InfluxDB clients try to create a database.
 	http.HandleFunc("/query", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, `{"results": []}`)
 	})
-
+	http.HandleFunc("/api/v2/query", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, ``)
+	})
 	// Some InfluxDB clients want to check if the http server is an influx endpoint
 	http.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
 		// InfluxDB returns a 204 on success.
