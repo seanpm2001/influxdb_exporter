@@ -11,8 +11,8 @@ transforms them and exposes them for consumption by Prometheus.
 
 This exporter supports float, int and boolean fields. Tags are converted to Prometheus labels.
 
-The exporter also listens on a UDP socket, port 9122 by default, where it
-exposes influxDB metrics using `/metrics` endpoint 
+The exporter also listens on a UDP socket, port 9122 by default, as well as the [v2 HTTP endpoints](#v2-support), where it
+exposes InfluxDB metrics using `/metrics` endpoint 
 and exposes exporter's self metrics using `/metrics/exporter` endpoint.
 
 ## Timestamps
@@ -75,6 +75,10 @@ Or if you want to use UDP instead:
 Note that Telegraf already supports outputing Prometheus metrics over HTTP via
 [`outputs.prometheus_client`][telegraf], which avoids having to also run the influxdb_exporter.
 
+## V2 Support
+InfluxDB V2 Support is currently in progress. Supported features include:
+- Querying for a null result
+- Writing data to the exporter - ignores [auth](https://github.com/prometheus/influxdb_exporter/issues/79) and metadata components (org, buckets)
 
 [circleci]: https://circleci.com/gh/prometheus/influxdb_exporter
 [hub]: https://hub.docker.com/r/prom/influxdb-exporter/
