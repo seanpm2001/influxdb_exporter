@@ -1,3 +1,7 @@
+## 0.9.0 / 2022-03-08
+
+* [FEATURE] Support ingestion from InfluxDB v2 clients ([#95](https://github.com/prometheus/influxdb_exporter/pull/95))
+
 ## 0.8.1 / 2021-11-26
 
 * [ENHANCEMENT] Update Go & dependencies to enable build for windows/arm64 ([#93](https://github.com/prometheus/influxdb_exporter/pull/93))
