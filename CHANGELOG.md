@@ -1,3 +1,7 @@
+## 0.9.1 / 2022-05-06
+
+This is a maintenance release, built with Go 1.17.9 to address security issues.
+
 ## 0.9.0 / 2022-03-08
 
 * [FEATURE] Support ingestion from InfluxDB v2 clients ([#95](https://github.com/prometheus/influxdb_exporter/pull/95))
