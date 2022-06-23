@@ -72,6 +72,15 @@ type influxDBSample struct {
 	Timestamp time.Time
 }
 
+type InfluxV2Health struct {
+	Checks  []struct{} `json:"checks"`
+	Commit  string     `json:"commit"`
+	Message string     `json:"message"`
+	Name    string     `json:"name"`
+	Status  string     `json:"status"`
+	Version string     `json:"version"`
+}
+
 type errorResponse struct {
 	Error string `json:"error"`
 }
@@ -365,6 +374,21 @@ func main() {
 	http.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
 		// InfluxDB returns a 204 on success.
 		http.Error(w, "", http.StatusNoContent)
+	})
+	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		// https://docs.influxdata.com/influxdb/v2.3/api/#operation/GetHealth
+		// Should return a 200 response
+		health := InfluxV2Health{
+			Checks:  []struct{}{},
+			Version: version.Version,
+			Status:  "pass",
+			Commit:  version.Revision,
+		}
+		w.WriteHeader(http.StatusOK)
+		err := json.NewEncoder(w).Encode(health)
+		if err != nil {
+			level.Warn(logger).Log("failed to encode JSON for health endpoint", err)
+		}
 	})
 
 	http.Handle(*metricsPath, promhttp.HandlerFor(influxDbRegistry, promhttp.HandlerOpts{}))
