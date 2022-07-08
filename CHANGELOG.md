@@ -1,3 +1,8 @@
+## 0.10.0 / 2022-07-08
+
+* [FEATURE] Add `/health` endpoint to make more InfluxDB clients happy ([#108](https://github.com/prometheus/influxdb_exporter/pull/108))
+* [CHANGE] Update dependencies and build with Go 1.18 ([#109](https://github.com/prometheus/influxdb_exporter/pull/109))
+
 ## 0.9.1 / 2022-05-06
 
 This is a maintenance release, built with Go 1.17.9 to address security issues.
