@@ -4,7 +4,7 @@ require (
 	github.com/go-kit/log v0.2.1
 	github.com/influxdata/influxdb v1.9.8
 	github.com/prometheus/client_golang v1.12.2
-	github.com/prometheus/common v0.35.0
+	github.com/prometheus/common v0.37.0
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 )
 
