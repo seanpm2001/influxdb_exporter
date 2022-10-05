@@ -33,7 +33,7 @@ http_requests_total{method="post",code="400"}    3 1395066363000
 
 When querying, this means that the sample is attributed to the time it was
 submitted to the exporter, not the time Prometheus scraped it. However, if the
-metric was submitted multiple time in between exporter scrapes, only the last
+metric was submitted multiple times in between exporter scrapes, only the last
 value and timestamp will be stored.
 
 ## Alternatives
@@ -72,7 +72,7 @@ Or if you want to use UDP instead:
   urls = ["udp://localhost:9122"]
 ```
 
-Note that Telegraf already supports outputing Prometheus metrics over HTTP via
+Note that Telegraf already supports outputting Prometheus metrics over HTTP via
 [`outputs.prometheus_client`][telegraf], which avoids having to also run the influxdb_exporter.
 
 ## V2 Support
