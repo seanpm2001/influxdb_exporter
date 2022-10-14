@@ -372,8 +372,16 @@ func main() {
 	})
 	// Some InfluxDB clients want to check if the http server is an influx endpoint
 	http.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
-		// InfluxDB returns a 204 on success.
-		http.Error(w, "", http.StatusNoContent)
+		verbose := r.URL.Query().Get("verbose")
+
+		if verbose != "" && verbose != "0" && verbose != "false" {
+			b, _ := json.Marshal(map[string]string{"version": version.Version})
+			w.Write(b)
+		} else {
+			w.Header().Set("X-Influxdb-Version", version.Version)
+			// InfluxDB returns a 204 on success.
+			w.WriteHeader(http.StatusNoContent)
+		}
 	})
 	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		// https://docs.influxdata.com/influxdb/v2.3/api/#operation/GetHealth
