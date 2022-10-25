@@ -1,3 +1,7 @@
+## 0.11.0 / 2022-10-25
+
+* [ENHANCEMENT] Improve compatibility of `/ping` endpoint ([#116](https://github.com/prometheus/influxdb_exporter/pull/116))
+
 ## 0.10.0 / 2022-07-08
 
 * [FEATURE] Add `/health` endpoint to make more InfluxDB clients happy ([#108](https://github.com/prometheus/influxdb_exporter/pull/108))
