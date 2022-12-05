@@ -317,7 +317,7 @@ func ReplaceInvalidChars(in *string) {
 	}
 }
 
-//JSONErrorResponse write error in json fromat and set response code
+// JSONErrorResponse write error in json fromat and set response code
 func JSONErrorResponse(w http.ResponseWriter, err string, code int) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
