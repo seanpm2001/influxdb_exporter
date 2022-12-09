@@ -102,7 +102,7 @@ func (c *influxDBCollector) serveUdp() {
 		if err != nil {
 			level.Error(c.logger).Log("msg", "Error parsing udp packet", "err", err)
 			udpParseErrors.Inc()
-			return
+			continue
 		}
 
 		c.parsePointsToSample(points)
