@@ -1,3 +1,7 @@
+## 0.11.1 / 2022-12-09
+
+* [BUGFIX] Continue processing UDP after badly formatted packages ([#120](https://github.com/prometheus/influxdb_exporter/pull/120))
+
 ## 0.11.0 / 2022-10-25
 
 * [ENHANCEMENT] Improve compatibility of `/ping` endpoint ([#116](https://github.com/prometheus/influxdb_exporter/pull/116))
