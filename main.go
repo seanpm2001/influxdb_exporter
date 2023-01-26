@@ -17,7 +17,7 @@ import (
 	"compress/gzip"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	"os"
@@ -143,7 +143,7 @@ func (c *influxDBCollector) influxDBPost(w http.ResponseWriter, r *http.Request)
 			JSONErrorResponse(w, fmt.Sprintf("error reading compressed body: %s", err), 500)
 			return
 		}
-		*bufPointer, err = ioutil.ReadAll(gunzip)
+		*bufPointer, err = io.ReadAll(gunzip)
 		if err != nil {
 			JSONErrorResponse(w, fmt.Sprintf("error decompressing data: %s", err), 500)
 			return
@@ -151,7 +151,7 @@ func (c *influxDBCollector) influxDBPost(w http.ResponseWriter, r *http.Request)
 	} else {
 		bufPointer := &buf
 		var err error
-		*bufPointer, err = ioutil.ReadAll(r.Body)
+		*bufPointer, err = io.ReadAll(r.Body)
 
 		if err != nil {
 			JSONErrorResponse(w, fmt.Sprintf("error reading body: %s", err), 500)
