@@ -1,3 +1,7 @@
+## 0.11.2 / 2023-01-26
+
+This is a maintenance release, updating dependencies.
+
 ## 0.11.1 / 2022-12-09
 
 * [BUGFIX] Continue processing UDP after badly formatted packages ([#120](https://github.com/prometheus/influxdb_exporter/pull/120))
