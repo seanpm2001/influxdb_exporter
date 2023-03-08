@@ -32,10 +32,10 @@ import (
 	"github.com/prometheus/common/promlog/flag"
 	"github.com/prometheus/common/version"
 
+	"github.com/alecthomas/kingpin/v2"
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
 	"github.com/influxdata/influxdb/models"
-	"gopkg.in/alecthomas/kingpin.v2"
 )
 
 const (
