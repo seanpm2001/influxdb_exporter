@@ -1,3 +1,7 @@
+## 0.11.4 / 2023-06-02
+
+* [SECURITY] Maintenance release, updating dependencies
+
 ## 0.11.3 / 2023-03-08
 
 * [Security] Update dependencies ([#131](https://github.com/prometheus/influxdb_exporter/pull/131))
